@@ -29,12 +29,33 @@ router.get('/', (req, res) => {
 });
 
 // list single student
+// router.get('/:id', (req, res) => {
+//   db('students')
+//     .where({id: req.params.id})
+//     .then(student => {
+//       if(student.length) {
+//         res.status(200).json(student)
+//       } else {
+//         res.status(404).json({ message: "No student by that id"})
+//       }
+//     })
+//     .catch(err => res.status(500).json({ message: "there was an error retrieving the student data"}))
+// });
+
 router.get('/:id', (req, res) => {
   db('students')
     .where({id: req.params.id})
     .then(student => {
       if(student.length) {
-        res.status(200).json(student)
+        console.log(student[0].cohort_id);
+        db('cohorts')
+        .where({id: student[0].cohort_id})
+        .then(cohort => {
+            res.status(200).json({id: student[0].id, name: student[0].name, cohort: cohort[0].name})
+        })
+        .catch(err => res.status(500).json({message: "there was an error retrieving the data"}))
+
+        // res.status(200).json(student)
       } else {
         res.status(404).json({ message: "No student by that id"})
       }
