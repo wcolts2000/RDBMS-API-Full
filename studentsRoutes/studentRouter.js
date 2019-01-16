@@ -42,35 +42,48 @@ router.get('/', (req, res) => {
 //     .catch(err => res.status(500).json({ message: "there was an error retrieving the student data"}))
 // });
 
+// router.get('/:id', (req, res) => {
+//   db('students')
+//     .where({id: req.params.id})
+//     .then(student => {
+//       if(student.length) {
+//         console.log(student[0].cohort_id);
+//         db('cohorts')
+//         .where({id: student[0].cohort_id})
+//         .then(cohort => {
+//             res.status(200).json({id: student[0].id, name: student[0].name, cohort: cohort[0].name})
+//         })
+//         .catch(err => res.status(500).json({message: "there was an error retrieving the data"}))
+
+//         // res.status(200).json(student)
+//       } else {
+//         res.status(404).json({ message: "No student by that id"})
+//       }
+//     })
+//     .catch(err => res.status(500).json({ message: "there was an error retrieving the student data"}))
+// });
+
 router.get('/:id', (req, res) => {
   db('students')
-    .where({id: req.params.id})
+    .select('students.id', 'students.name', 'cohorts.name as cohort')
+    .join('cohorts', 'students.cohort_id', 'cohorts.id')
+    .where({'students.id': req.params.id})
     .then(student => {
       if(student.length) {
-        console.log(student[0].cohort_id);
-        db('cohorts')
-        .where({id: student[0].cohort_id})
-        .then(cohort => {
-            res.status(200).json({id: student[0].id, name: student[0].name, cohort: cohort[0].name})
-        })
-        .catch(err => res.status(500).json({message: "there was an error retrieving the data"}))
-
-        // res.status(200).json(student)
-      } else {
-        res.status(404).json({ message: "No student by that id"})
-      }
+        res.status(200).json(student)
+      } else {res.status(404).json({ message: "No student found by that id"})}
     })
-    .catch(err => res.status(500).json({ message: "there was an error retrieving the student data"}))
-});
+    .catch(err => res.status(500).json({ message: "There was an error retrieving the data"}))
+})
 
 //update student
 router.put('/:id', (req, res) => {
-  const changedstudent = req.body;
+  const changedStudent = req.body;
 
-  if(changedstudent.name.length) {
+  if(changedStudent.name.length) {
     db('students')
       .where({ id: req.params.id})
-      .update(changedstudent)
+      .update(changedStudent)
       .then(count => {
         if(count) {
           res.status(200).json(count)
