@@ -9,7 +9,7 @@ router.post('/', (req, res) => {
 
   if(name.length) {
     db('cohorts')
-      .insert(name)
+      .insert(req.body)
       .then( ids => {
         db('cohorts')
           .where({id: ids[0]})
@@ -40,6 +40,20 @@ router.get('/:id', (req, res) => {
       }
     })
     .catch(err => res.status(500).json({ message: "there was an error retrieving the cohort data"}))
+});
+
+// list all students from a specified cohort
+router.get('/:id/students', (req, res) => {
+  db('students')
+  .where({ cohort_id: req.params.id})
+  .then(students => {
+    if(students.length) {
+      res.status(200).json(students)
+    } else {
+      res.status(404).json({message: "no cohort with that id or no students associated with that cohort yet"})
+    }
+  })
+  .catch(err => res.status(500).json({ message: " there was an error retrieving the students for the cohort"}))
 });
 
 //update cohort

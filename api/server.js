@@ -2,7 +2,7 @@ const express = require('express');
 const configMiddleware = require('../config/middleware');
 
 const cohortRouter = require("../cohortsRoutes/cohortsRouter");
-const studentRouter = require("../studentsRoutes/studentsRouter");
+const studentRouter = require("../studentsRoutes/studentRouter");
 
 const server = express();
 
